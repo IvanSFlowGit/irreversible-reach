@@ -1,0 +1,23 @@
+# The defect this tool was built from, as a manifest.
+# `check` fails on it. Add the gate at the bottom and it passes.
+actions:
+  send_reminder:
+    reversible: true
+  escalate_to_signatory:
+    reversible: false        # emails the client's finance director
+  suppress_chasing:
+    reversible: false        # stops all follow-up on this invoice
+
+sources:
+  invoice_state:
+    produced_by: model       # a five state label read from reply text
+  payment_lag:
+    produced_by: deterministic
+
+flows:
+  - {from: invoice_state, to: send_reminder}
+  - {from: invoice_state, to: escalate_to_signatory}
+  - {from: invoice_state, to: suppress_chasing}
+  - {from: payment_lag,   to: suppress_chasing}
+
+gates: []

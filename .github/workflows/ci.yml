@@ -1,0 +1,28 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install pyyaml
+      - run: python3 test_irreversible_reach.py
+      # The example is the defect this tool exists for, so it MUST fail.
+      # A green run on it would mean the checker had stopped checking.
+      # Exit 1 means the defect was found. Exit 0 means the check is dead, and
+      # anything else (2, a traceback) means it crashed, which must not pass.
+      - name: the failing example must fail with exit 1
+        run: |
+          set +e
+          python3 irreversible_reach.py check examples/reach.yaml
+          code=$?
+          if [ "$code" -ne 1 ]; then
+            echo "expected exit 1 on the example manifest, got $code"
+            exit 1
+          fi

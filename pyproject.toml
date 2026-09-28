@@ -1,0 +1,21 @@
+[project]
+name = "irreversible-reach"
+version = "0.1.0"
+description = "Which of your agent's model-produced values can reach an irreversible action?"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+dependencies = []
+
+[project.optional-dependencies]
+yaml = ["pyyaml>=5.1"]
+
+[project.scripts]
+irreversible-reach = "irreversible_reach:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["irreversible_reach"]
