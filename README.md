@@ -57,8 +57,12 @@ model-controlled values can reach a side effect, and what stands in between.**
 ## Install
 
 ```
-pip install pyyaml        # only if your manifest is YAML
+pip install "irreversible-reach[yaml] @ git+https://github.com/IvanSFlowGit/irreversible-reach"
 ```
+
+That puts `irreversible-reach` on your path. Or copy `irreversible_reach.py`
+into your repo and run `python3 irreversible_reach.py check reach.yaml`; it needs
+PyYAML only if your manifest is YAML.
 
 One file, no framework, no runtime, nothing to instrument. It reads a manifest
 and exits.
@@ -133,7 +137,7 @@ Three options, and they are not equal.
 actions whose worst case is a person reading something.** If your model owns
 the two states that both route to a human, a wrong label costs somebody five
 minutes. If it owns the state that stops all follow-up, a wrong label loses the
-money quietly.
+money and nothing tells you.
 
 ## What it does not do
 
@@ -146,9 +150,9 @@ It does not read your source, instrument your runtime, or talk to a model.
 
 ## Status
 
-Early. The graph analysis and the refusals are covered by 22 tests with a
-control in both directions for every rule, because a check that passes
-everything and a check that is not running look identical.
+Early. The graph analysis and the refusals are tested with a control in both
+directions for every rule, because a check that passes everything and a
+check that is not running look identical.
 
 Issues and manifests from real agents are the most useful thing you can send.
 
