@@ -1,0 +1,33 @@
+# PayPilot (github.com/IvanSFlowGit/paypilot), a failed-payment recovery agent.
+# The model writes the diagnosis and the dunning email. The failure code comes from
+# the processor (Stripe or Recharge) and the strategy from a fixed table, so neither
+# is model-produced. The email is the only action that cannot be undone.
+actions:
+  send_dunning_email:
+    reversible: false      # a sent email cannot be recalled
+  report_schedule:
+    reversible: true       # a value in the API response, nothing leaves
+
+sources:
+  failure_code:
+    produced_by: deterministic   # read from the processor webhook
+  strategy:
+    produced_by: deterministic   # lookup in app/decision.py
+  diagnosis:
+    produced_by: model
+  email_text:
+    produced_by: model
+
+flows:
+  - {from: failure_code, to: report_schedule}
+  - {from: strategy,     to: send_dunning_email}
+  - {from: diagnosis,    to: send_dunning_email}
+  - {from: email_text,   to: send_dunning_email}
+
+# Before any send: PAYPILOT_SEND_EMAIL must be set, the touch cap and cooldown must
+# allow it, the invoice must not already be paid, and the finished text must pass
+# the foreign-link and leaked-secret guards (unresolved placeholders are refused
+# earlier, when the draft is made). All deterministic. They check the email's shape,
+# not whether the diagnosis is right.
+gates:
+  - {on: send_dunning_email, kind: deterministic}

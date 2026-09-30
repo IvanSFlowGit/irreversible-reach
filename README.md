@@ -154,6 +154,11 @@ Early. The graph analysis and the refusals are tested with a control in both
 directions for every rule, because a check that passes everything and a
 check that is not running look identical.
 
+A real one to start from: [`examples/paypilot.yaml`](examples/paypilot.yaml) maps
+PayPilot, a failed-payment recovery agent. It passes because every path from the
+model to the one irreversible action, sending an email, goes through deterministic
+guards, and it fails the moment those guards come out.
+
 Issues and manifests from real agents are the most useful thing you can send.
 
 MIT.
