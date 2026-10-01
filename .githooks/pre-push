@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Refuse a push that CI would fail: the suite, the example that must exit 1,
+# and the PayPilot example that must pass. Added 2026-10-01.
+set -uo pipefail
+cd "$(git rev-parse --show-toplevel)" || exit 1
+PY="$HOME/.venvs/irreversible-reach/bin/python"
+[ -x "$PY" ] || PY=python3
+"$PY" -c "import yaml" 2>/dev/null || { echo "pre-push: PyYAML missing for $PY, cannot verify; refusing" >&2; exit 1; }
+fail=0
+"$PY" test_irreversible_reach.py >/tmp/ir_t.$$ 2>&1 || { echo "pre-push: tests failed" >&2; tail -5 /tmp/ir_t.$$ >&2; fail=1; }
+"$PY" irreversible_reach.py check examples/reach.yaml >/dev/null 2>&1; c=$?
+[ "$c" = 1 ] || { echo "pre-push: examples/reach.yaml exited $c, expected 1" >&2; fail=1; }
+"$PY" irreversible_reach.py check examples/paypilot.yaml >/dev/null 2>&1; c=$?
+[ "$c" = 0 ] || { echo "pre-push: examples/paypilot.yaml exited $c, expected 0" >&2; fail=1; }
+rm -rf __pycache__ /tmp/ir_t.$$
+[ "$fail" = 0 ] && echo "pre-push: tests and both examples clean" >&2
+exit "$fail"
