@@ -26,3 +26,15 @@ jobs:
             echo "expected exit 1 on the example manifest, got $code"
             exit 1
           fi
+      # A real agent's manifest (PayPilot) must pass: its one irreversible
+      # action is gated. Exit 0 only; anything else means the check or the
+      # example broke.
+      - name: the PayPilot example must pass with exit 0
+        run: |
+          set +e
+          python3 irreversible_reach.py check examples/paypilot.yaml
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "expected exit 0 on examples/paypilot.yaml, got $code"
+            exit 1
+          fi
